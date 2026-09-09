@@ -10,87 +10,19 @@
     return false;
   });
 
-  // 2. Bloquer les raccourcis clavier dangereux
-  document.addEventListener('keydown', function(e) {
-    // F12
-    if (e.key === 'F12' || e.keyCode === 123) {
-      e.preventDefault();
-      return false;
-    }
-    // Ctrl+Shift+I / Ctrl+Shift+J / Ctrl+Shift+C (DevTools)
-    if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) {
-      e.preventDefault();
-      return false;
-    }
-    // Ctrl+U (voir source)
-    if (e.ctrlKey && (e.key === 'U' || e.key === 'u')) {
-      e.preventDefault();
-      return false;
-    }
-    // Ctrl+S (sauvegarder)
-    if (e.ctrlKey && (e.key === 'S' || e.key === 's')) {
-      e.preventDefault();
-      return false;
-    }
-    // Ctrl+P (imprimer)
-    if (e.ctrlKey && (e.key === 'P' || e.key === 'p')) {
-      e.preventDefault();
-      return false;
-    }
-  });
-
-  // 3. Détection DevTools ouverts (méthode taille fenêtre)
-  const threshold = 160;
-  function isDevToolsOpen() {
-    return (
-      window.outerWidth - window.innerWidth > threshold ||
-      window.outerHeight - window.innerHeight > threshold
-    );
-  }
-
-  function devToolsReaction() {
-    document.body.innerHTML = '';
-    document.body.style.background = '#000';
-    document.body.style.display = 'flex';
-    document.body.style.alignItems = 'center';
-    document.body.style.justifyContent = 'center';
-    const msg = document.createElement('div');
-    msg.style.cssText = 'color:#00CED1;font-family:monospace;font-size:22px;text-align:center;';
-    msg.innerHTML = '⛔ ACCESS DENIED<br><span style="font-size:13px;color:#aaa;">Developer tools detected.</span>';
-    document.body.appendChild(msg);
-  }
-
-  // 4. Détection via debugger (ralentissement)
-  let devToolsChecker = setInterval(function() {
-    const start = performance.now();
-    (function() {}['constructor']('debugger')());
-    const elapsed = performance.now() - start;
-    if (elapsed > 100 || isDevToolsOpen()) {
-      clearInterval(devToolsChecker);
-      devToolsReaction();
-    }
-  }, 1000);
-
-  // 5. Désactiver la sélection de texte
+  // 2. Désactiver la sélection de texte
   document.addEventListener('selectstart', function(e) {
     e.preventDefault();
     return false;
   });
 
-  // 6. Désactiver le drag des images
+  // 3. Désactiver le drag des images
   document.addEventListener('dragstart', function(e) {
     e.preventDefault();
     return false;
   });
 
-  // 7. Bloquer la console (remplacer les méthodes)
-  const noop = function() {};
-  const methods = ['log', 'debug', 'info', 'warn', 'error', 'table', 'dir'];
-  methods.forEach(function(method) {
-    console[method] = noop;
-  });
-
-  // 8. Anti-iframe (clickjacking)
+  // 4. Anti-iframe (clickjacking)
   if (window.top !== window.self) {
     window.top.location = window.self.location;
   }
